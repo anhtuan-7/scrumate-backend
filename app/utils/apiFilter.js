@@ -14,4 +14,4 @@ const getFilter = (req) => {
   return filter;
 };
 
-module.exports = { getFilter };
+module.exports = getFilter;

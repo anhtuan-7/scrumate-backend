@@ -11,6 +11,8 @@ const { NOT_FOUND } = require('./common/statusCode');
 // Route
 const isJsonContentType = require('./middlewares/isJsonContentType');
 const authRoute = require('./routes/authRoute');
+const userRoute = require('./routes/userRoute');
+const organizationRoute = require('./routes/organizationRoute');
 
 const app = express();
 
@@ -27,6 +29,8 @@ app
   .put(isJsonContentType);
 
 app.use('/api/v1/', authRoute);
+app.use('/api/v1/users', userRoute);
+app.use('/api/v1/organizations', organizationRoute);
 
 app.use('*', (req, res, next) => {
   next(

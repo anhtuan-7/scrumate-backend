@@ -25,6 +25,7 @@ const setTokenAndRespond = (res, user, statusCode) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const { email, password, name } = res.locals.data;
   const existingUser = await User.findOne({ where: { email } });
+
   if (existingUser)
     return next(
       new AppError(CONFLICT, 'Email already exists', EMAIL_ALREADY_EXISTS),
