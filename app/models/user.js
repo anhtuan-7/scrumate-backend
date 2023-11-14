@@ -39,8 +39,8 @@ const User = sequelize.define(
     tableName: 'user',
     indexes: [{ unique: true, fields: ['email'] }],
     hooks: {
-      beforeSave: (user) => {
-        if (user.password) user.password = hashPassword(user.password);
+      beforeSave: async (user) => {
+        if (user.password) user.password = await hashPassword(user.password);
       },
       beforeFind: (options) => {
         options.where = { active: true };

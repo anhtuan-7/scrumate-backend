@@ -1,7 +1,7 @@
 const AppError = require('../errors/appError');
 const { UNSUPPORTED_MEDIA_TYPE } = require('../common/statusCode');
 
-exports.checkJsonContentType = (req, res, next) => {
+const isJsonContentType = (req, res, next) => {
   if (!req.is('application/json'))
     return next(
       new AppError(
@@ -11,3 +11,5 @@ exports.checkJsonContentType = (req, res, next) => {
     );
   next();
 };
+
+module.exports = isJsonContentType;

@@ -12,7 +12,7 @@ const signToken = (userId) =>
 
 const setTokenCookie = (res, token) => {
   const cookieOptions = {
-    expires: new Date(Date.now() + process.env.JWT_COOKIE_AGE),
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_AGE * 1),
     httpOnly: true,
   };
   res.cookie('jwt', token, cookieOptions);
