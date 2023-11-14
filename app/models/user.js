@@ -43,7 +43,8 @@ const User = sequelize.define(
         if (user.password) user.password = await hashPassword(user.password);
       },
       beforeFind: (options) => {
-        options.where = { active: true };
+        if (options.where) options.where.active = true;
+        else options.where = { active: true };
       },
     },
   },
