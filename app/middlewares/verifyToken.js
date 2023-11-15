@@ -5,7 +5,7 @@ const User = require('../models/user');
 const catchAsync = require('../errors/catchAsync');
 const { hasPasswordChanged } = require('../utils/auth');
 const { USER_NOT_FOUND } = require('../common/customCode');
-const { UNAUTHORIZED } = require('../common/statusCode');
+const { UNAUTHORIZED, NOT_FOUND } = require('../common/statusCode');
 
 const verifyToken = catchAsync(async (req, res, next) => {
   const token = req.cookies.jwt;
@@ -25,7 +25,7 @@ const verifyToken = catchAsync(async (req, res, next) => {
   const user = await User.findByPk(decodedPayload.id);
   if (!user)
     return next(
-      new AppError(UNAUTHORIZED, 'User not found on server', USER_NOT_FOUND),
+      new AppError(NOT_FOUND, 'User not found on server', USER_NOT_FOUND),
     );
 
   if (hasPasswordChanged(user.passwordChangedAt, decodedPayload.iat))
