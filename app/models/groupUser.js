@@ -1,16 +1,16 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./connection');
 const User = require('./user');
-const Organization = require('./organization');
+const Group = require('./group');
 
-const OrganizationUser = sequelize.define(
-  'organizationUser',
+const GroupUser = sequelize.define(
+  'groupUser',
   {
-    organizationId: {
+    groupId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
-        model: Organization,
+        model: Group,
         key: 'id',
       },
     },
@@ -27,27 +27,30 @@ const OrganizationUser = sequelize.define(
       allowNull: false,
       defaultValue: 'member',
     },
+    lastAccess: {
+      type: DataTypes.DATE,
+    },
   },
   {
-    tableName: 'organization_user',
+    tableName: 'group_user',
   },
 );
 
-Organization.belongsToMany(User, {
-  through: OrganizationUser,
-  foreignKey: 'organizationId',
+Group.belongsToMany(User, {
+  through: GroupUser,
+  foreignKey: 'groupId',
 });
-User.belongsToMany(Organization, {
-  through: OrganizationUser,
+User.belongsToMany(Group, {
+  through: GroupUser,
   foreignKey: 'userId',
 });
 
-Organization.addHook('afterCreate', async (org) => {
-  await OrganizationUser.create({
-    organizationId: org.id,
-    userId: org.creatorId,
+Group.addHook('afterCreate', async (group) => {
+  await GroupUser.create({
+    groupId: group.id,
+    userId: group.creatorId,
     role: 'admin',
   });
 });
 
-module.exports = OrganizationUser;
+module.exports = GroupUser;

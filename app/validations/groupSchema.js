@@ -1,7 +1,8 @@
 const Joi = require('joi');
 
-const organizationCreateSchema = Joi.object({
+const groupCreateSchema = Joi.object({
   name: Joi.string().min(3).max(100).required(),
+  description: Joi.string,
 });
 
 const addMemberSchema = Joi.object({
@@ -9,4 +10,4 @@ const addMemberSchema = Joi.object({
   role: Joi.string().valid('member', 'group-admin', 'project-admin'),
 });
 
-module.exports = { organizationCreateSchema, addMemberSchema };
+module.exports = { groupCreateSchema, addMemberSchema };

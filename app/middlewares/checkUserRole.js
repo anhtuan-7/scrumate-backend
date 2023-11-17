@@ -1,15 +1,15 @@
-const { OrganizationUser } = require('../models');
+const { GroupUser } = require('../models');
 const catchAsync = require('../errors/catchAsync');
 const AppError = require('../errors/appError');
 const { FORBIDDEN } = require('../common/statusCode');
 
-exports.checkUserRoleInOrganization = (...roles) => {
+exports.checkUserRoleInGroup = (...roles) => {
   if (roles.length === 0) roles = ['admin', 'project-admin', 'member'];
   return catchAsync(async (req, res, next) => {
-    const data = await OrganizationUser.findOne({
+    const data = await GroupUser.findOne({
       where: {
         userId: res.locals.user.id,
-        organizationId: req.params.id,
+        groupId: req.params.id, // actions that relate to a specific group
       },
     });
     if (data && roles.includes(data.role)) return next();

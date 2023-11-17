@@ -2,8 +2,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('./connection');
 const User = require('./user');
 
-const Organization = sequelize.define(
-  'organization',
+const Group = sequelize.define(
+  'group',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -15,6 +15,9 @@ const Organization = sequelize.define(
       unique: true,
       allowNull: false,
     },
+    description: {
+      type: DataTypes.TEXT,
+    },
     creatorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -25,11 +28,11 @@ const Organization = sequelize.define(
     },
   },
   {
-    tableName: 'organization',
+    tableName: 'group',
   },
 );
 
 // An user can create many groups
-Organization.belongsTo(User, { as: 'creator', foreignKey: 'creatorId' });
+Group.belongsTo(User, { as: 'creator', foreignKey: 'creatorId' });
 
-module.exports = Organization;
+module.exports = Group;
