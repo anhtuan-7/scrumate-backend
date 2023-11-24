@@ -11,7 +11,7 @@ process.on('uncaughtException', (err) => {
 
 const app = require('./app');
 require('./models/connection');
-require('./utils/dbSync');
+// require('./utils/dbSync');
 
 const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
