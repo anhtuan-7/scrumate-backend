@@ -25,10 +25,17 @@ const GroupUser = sequelize.define(
     role: {
       type: DataTypes.ENUM(['admin', 'project-admin', 'member', 'inactive']),
       allowNull: false,
-      defaultValue: 'member',
+      defaultValue: 'inactive',
     },
-    lastAccess: {
+    lastAccessed: {
       type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    joinedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
   },
   {
@@ -37,13 +44,17 @@ const GroupUser = sequelize.define(
 );
 
 Group.belongsToMany(User, {
-  through: GroupUser,
+  through: { model: GroupUser, as: 'metadata' },
   foreignKey: 'groupId',
 });
 User.belongsToMany(Group, {
-  through: GroupUser,
+  through: { model: GroupUser, as: 'metadata' },
   foreignKey: 'userId',
 });
+
+// Super Many-to-Many relationship
+Group.hasMany(GroupUser, { foreignKey: 'groupId', as: 'data' });
+GroupUser.belongsTo(Group, { foreignKey: 'groupId', as: 'data' });
 
 Group.addHook('afterCreate', async (group) => {
   await GroupUser.create({

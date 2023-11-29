@@ -32,7 +32,7 @@ const Group = sequelize.define(
   },
 );
 
-// An user can create many groups
 Group.belongsTo(User, { as: 'creator', foreignKey: 'creatorId' });
+User.hasMany(Group, { foreignKey: 'creatorId' });
 
 module.exports = Group;

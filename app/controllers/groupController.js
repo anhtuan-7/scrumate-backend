@@ -1,32 +1,34 @@
-const { User, Group, GroupUser } = require('../models');
+const { Group, GroupUser } = require('../models');
 const { OK, CREATED } = require('../common/statusCode');
 const catchAsync = require('../errors/catchAsync');
 const getFilter = require('../utils/apiFilter');
 
 exports.getGroupList = catchAsync(async (req, res, next) => {
-  const userId = res.locals.user.id;
   const filter = getFilter(req);
-  const groups = await Group.findAll({
-    order: [[filter.sort, filter.order]],
+  const { count, rows } = await GroupUser.findAndCountAll({
+    where: { userId: res.locals.user.id },
+    order: [[filter.sort, filter.order]], // sort by lastAccessed or joinAt
     limit: filter.limit,
     offset: filter.skip,
     include: {
-      model: User,
-      attributes: [],
-      through: GroupUser,
-      where: { id: userId },
+      model: Group,
+      as: 'data',
+      attributes: ['id', 'name', 'description'],
     },
+    attributes: ['role', 'lastAccessed', 'joinedAt'],
   });
+
   res.status(OK).json({
     status: 'success',
-    results: groups.length,
-    data: { groups },
+    results: rows.length,
+    total: count,
+    data: { groups: rows },
   });
 });
 
 exports.getGroup = catchAsync(async (req, res, next) => {
   const group = await Group.findByPk(req.params.id, {
-    include: [],
+    include: [], // projects
   });
   res.status(OK).json({
     status: 'success',
@@ -35,9 +37,10 @@ exports.getGroup = catchAsync(async (req, res, next) => {
 });
 
 exports.createGroup = catchAsync(async (req, res, next) => {
-  const { data } = res.locals;
-  data.creatorId = res.locals.user.id;
-  const group = await Group.create(data);
+  const group = await Group.create({
+    ...res.locals.data,
+    creatorId: res.locals.user.id,
+  });
   res.status(CREATED).json({
     status: 'success',
     data: { group },

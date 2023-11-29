@@ -9,7 +9,7 @@ exports.checkUserRoleInGroup = (...roles) => {
     const data = await GroupUser.findOne({
       where: {
         userId: res.locals.user.id,
-        groupId: req.params.id, // actions that relate to a specific group
+        groupId: req.params.groupId, // actions that relate to a specific group
       },
     });
     if (data && roles.includes(data.role)) return next();

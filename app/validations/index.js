@@ -1,6 +1,7 @@
 const AppError = require('../errors/appError');
+const { BAD_REQUEST } = require('../common/statusCode');
 
-const validate = (schema, errorCode) => {
+const validate = (schema, errorCode = BAD_REQUEST) => {
   return (req, res, next) => {
     const result = schema
       .options({
