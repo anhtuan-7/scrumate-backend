@@ -45,6 +45,8 @@ const User = sequelize.define(
       beforeFind: (options) => {
         if (options.where) options.where.active = true;
         else options.where = { active: true };
+
+        // options.attributes.
       },
     },
   },

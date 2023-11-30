@@ -6,7 +6,6 @@ const db = {
   host: process.env.DATABASE_HOST,
   username: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
-  logging: () => process.env.NODE_ENV === 'development',
 };
 
 const sequelize = new Sequelize(db.name, db.username, db.password, {
@@ -16,7 +15,7 @@ const sequelize = new Sequelize(db.name, db.username, db.password, {
     timestamps: true,
     underscored: true,
   },
-  logging: false, //db.logging(),
+  logging: false,
 });
 
 module.exports = sequelize;

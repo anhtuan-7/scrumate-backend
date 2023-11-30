@@ -1,21 +1,31 @@
-const { Group, GroupUser } = require('../models');
-const { OK, CREATED } = require('../common/statusCode');
 const catchAsync = require('../errors/catchAsync');
+const AppError = require('../errors/appError');
 const getFilter = require('../utils/apiFilter');
+const { OK, CREATED, NOT_FOUND } = require('../common/statusCode');
+const { GROUP_NOT_FOUND } = require('../common/customCode');
+const { Group, GroupUser } = require('../models');
 
 exports.getGroupList = catchAsync(async (req, res, next) => {
   const filter = getFilter(req);
-  const { count, rows } = await GroupUser.findAndCountAll({
-    where: { userId: res.locals.user.id },
-    order: [[filter.sort, filter.order]], // sort by lastAccessed or joinAt
+  const { count, rows } = await Group.findAndCountAll({
+    order: [
+      [
+        { model: GroupUser, as: 'groupUser' },
+        filter.sort || 'joinedAt',
+        filter.order,
+      ],
+    ],
     limit: filter.limit,
     offset: filter.skip,
     include: {
-      model: Group,
-      as: 'data',
-      attributes: ['id', 'name', 'description'],
+      model: GroupUser,
+      as: 'groupUser',
+      where: { userId: res.locals.user.id },
+      attributes: ['role', 'lastAccessed', 'joinedAt'],
     },
-    attributes: ['role', 'lastAccessed', 'joinedAt'],
+    attributes: ['id', 'name', 'description'],
+    raw: true,
+    nest: true,
   });
 
   res.status(OK).json({
@@ -27,9 +37,11 @@ exports.getGroupList = catchAsync(async (req, res, next) => {
 });
 
 exports.getGroup = catchAsync(async (req, res, next) => {
-  const group = await Group.findByPk(req.params.id, {
+  const group = await Group.findByPk(req.params.groupId, {
     include: [], // projects
   });
+  if (!group)
+    return next(new AppError(NOT_FOUND, 'User not found', GROUP_NOT_FOUND));
   res.status(OK).json({
     status: 'success',
     data: { group },

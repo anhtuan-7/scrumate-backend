@@ -1,7 +1,7 @@
 /* eslint-disable */
-const { User, Group, GroupUser } = require('../models');
+const { User, Group, GroupUser, Project, ProjectUser } = require('../models');
 
-const tables = [User, Group, GroupUser];
+const tables = [User, Group, GroupUser, Project, ProjectUser];
 
 async function syncTables() {
   for (const table of tables) {

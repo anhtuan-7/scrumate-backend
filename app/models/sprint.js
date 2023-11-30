@@ -1,9 +1,10 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('./connection');
 const User = require('./user');
+const Project = require('./project');
 
-const Group = sequelize.define(
-  'group',
+const Sprint = sequelize.define(
+  'sprint',
   {
     id: {
       type: DataTypes.INTEGER,
@@ -12,11 +13,25 @@ const Group = sequelize.define(
     },
     name: {
       type: DataTypes.STRING,
-      unique: true,
       allowNull: false,
     },
-    description: {
+    sprintGoal: {
       type: DataTypes.TEXT,
+    },
+    startDate: {
+      type: DataTypes.DATE,
+    },
+    duration: {
+      type: DataTypes.INTEGER,
+      defaultValue: 2, // 2 Weeks
+    },
+    projectId: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      references: {
+        model: Project,
+        key: 'id',
+      },
     },
     creatorId: {
       type: DataTypes.INTEGER,
@@ -28,11 +43,8 @@ const Group = sequelize.define(
     },
   },
   {
-    tableName: 'group',
+    tableName: 'sprint',
   },
 );
 
-User.hasMany(Group, { foreignKey: 'creatorId' });
-Group.belongsTo(User, { as: 'creator', foreignKey: 'creatorId' });
-
-module.exports = Group;
+module.exports = Sprint;

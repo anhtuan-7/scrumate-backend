@@ -17,6 +17,6 @@ router
   .get(groupController.getGroupList)
   .post(validate(groupCreateSchema, BAD_REQUEST), groupController.createGroup);
 
-router.route('/:id').get(checkUserRoleInGroup(), groupController.getGroup);
+router.route('/:groupId').get(checkUserRoleInGroup(), groupController.getGroup);
 
 module.exports = router;

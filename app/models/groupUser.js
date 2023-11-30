@@ -32,29 +32,20 @@ const GroupUser = sequelize.define(
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    joinedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
-    },
+    // joinedAt = createdAt
   },
   {
     tableName: 'group_user',
+    createdAt: 'joinedAt',
   },
 );
 
-Group.belongsToMany(User, {
-  through: { model: GroupUser, as: 'metadata' },
-  foreignKey: 'groupId',
-});
-User.belongsToMany(Group, {
-  through: { model: GroupUser, as: 'metadata' },
-  foreignKey: 'userId',
-});
+Group.belongsToMany(User, { through: GroupUser, foreignKey: 'groupId' });
+User.belongsToMany(Group, { through: GroupUser, foreignKey: 'userId' });
 
 // Super Many-to-Many relationship
-Group.hasMany(GroupUser, { foreignKey: 'groupId', as: 'data' });
-GroupUser.belongsTo(Group, { foreignKey: 'groupId', as: 'data' });
+Group.hasMany(GroupUser, { foreignKey: 'groupId', as: 'groupUser' });
+User.hasMany(GroupUser, { foreignKey: 'userId', as: 'group' });
 
 Group.addHook('afterCreate', async (group) => {
   await GroupUser.create({
