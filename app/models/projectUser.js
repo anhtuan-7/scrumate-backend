@@ -35,6 +35,7 @@ const ProjectUser = sequelize.define(
   },
   {
     tableName: 'project_user',
+    createdAt: 'joinedAt',
   },
 );
 
@@ -42,15 +43,13 @@ Project.belongsToMany(User, { through: ProjectUser, foreignKey: 'projectId' });
 User.belongsToMany(Project, { through: ProjectUser, foreignKey: 'userId' });
 
 // Super Many-to-Many relationship
-Project.hasMany(ProjectUser, { foreignKey: 'projectId' });
-ProjectUser.belongsTo(Project, { foreignKey: 'projectId' });
-User.hasMany(ProjectUser, { foreignKey: 'userId' });
-ProjectUser.belongsTo(User, { foreignKey: 'userId' });
+Project.hasMany(ProjectUser, { foreignKey: 'projectId', as: 'projectUser' });
+User.hasMany(ProjectUser, { foreignKey: 'userId', as: 'project' });
 
-Project.addHook('afterCreate', async (group) => {
+Project.addHook('afterCreate', async (project) => {
   await ProjectUser.create({
-    projectIdId: group.id,
-    userId: group.creatorId,
+    projectId: project.id,
+    userId: project.creatorId,
     role: 'scrum-master',
   });
 });

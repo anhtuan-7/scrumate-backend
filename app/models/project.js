@@ -16,14 +16,18 @@ const Project = sequelize.define(
       allowNull: null,
     },
     key: {
-      type: DataTypes.STRING(5),
+      type: DataTypes.STRING(8),
       allowNull: false,
     },
     description: {
       type: DataTypes.TEXT,
     },
+    repository: {
+      type: DataTypes.TEXT,
+    },
     groupId: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       references: {
         model: Group,
         key: 'id',
@@ -37,12 +41,15 @@ const Project = sequelize.define(
         key: 'id',
       },
     },
-    repository: {
-      type: DataTypes.TEXT,
-    },
   },
   {
     tableName: 'project',
+    indexes: [
+      {
+        unique: true,
+        fields: ['name', 'group_id'],
+      },
+    ],
   },
 );
 

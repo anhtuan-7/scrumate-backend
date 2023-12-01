@@ -7,6 +7,7 @@ const {
 } = require('../common/statusCode');
 
 const handlePostgresError = (err) => {
+  // console.log(err)
   let message = `[${err.message}] `;
   if (err.errors)
     message = message.concat(`${err.errors[0].type}: ${err.errors[0].message}`);

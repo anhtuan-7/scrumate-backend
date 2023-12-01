@@ -7,17 +7,21 @@ const { OK, UNAUTHORIZED } = require('../common/statusCode');
 
 const router = express.Router();
 
-router
-  .route('/signup')
-  .post(validate(signUpSchema, UNAUTHORIZED), authController.signup);
+router.post(
+  '/signup',
+  validate(signUpSchema, UNAUTHORIZED),
+  authController.signup,
+);
 
-router
-  .route('/login')
-  .post(validate(loginSchema, UNAUTHORIZED), authController.login);
+router.post(
+  '/login',
+  validate(loginSchema, UNAUTHORIZED),
+  authController.login,
+);
 
-router.route('/logout').get(authController.logout);
+router.get('/logout', authController.logout);
 
-router.route('/verify').get(verifyToken, (req, res) => {
+router.get('/verify', verifyToken, (req, res) => {
   const { user } = res.locals;
   user.password = undefined;
   res.status(OK).json({

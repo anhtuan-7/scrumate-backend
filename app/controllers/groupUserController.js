@@ -1,13 +1,20 @@
 const catchAsync = require('../errors/catchAsync');
 const AppError = require('../errors/appError');
 const getFilter = require('../utils/apiFilter');
-const { OK, CREATED, NOT_FOUND } = require('../common/statusCode');
+const { OK, CREATED, NOT_FOUND, FORBIDDEN } = require('../common/statusCode');
 const { USER_NOT_FOUND } = require('../common/customCode');
 const { User, GroupUser } = require('../models');
 
 exports.getGroupMember = catchAsync(async (req, res, next) => {
   const filter = getFilter(req);
   const { count, rows } = await User.findAndCountAll({
+    include: {
+      model: GroupUser,
+      as: 'group',
+      attributes: ['role', 'lastAccessed', 'joinedAt'],
+      where: { groupId: req.params.groupId },
+    },
+    attributes: ['id', 'email', 'name'],
     order: [
       [
         { model: GroupUser, as: 'group' },
@@ -17,13 +24,6 @@ exports.getGroupMember = catchAsync(async (req, res, next) => {
     ],
     limit: filter.limit,
     offset: filter.skip,
-    include: {
-      model: GroupUser,
-      as: 'group',
-      attributes: ['role', 'lastAccessed', 'joinedAt'],
-      where: { groupId: req.params.groupId },
-    },
-    attributes: ['id', 'email', 'name'],
     raw: true,
     nest: true,
   });
@@ -56,12 +56,17 @@ exports.addGroupMember = catchAsync(async (req, res, next) => {
 });
 
 exports.changeMemberRole = catchAsync(async (req, res, next) => {
+  const { userId } = res.locals.data;
+
+  if (userId === res.locals.user.id)
+    return next(new AppError(FORBIDDEN, 'You can not change your own role'));
+
   const affectedRow = await GroupUser.update(
     { role: res.locals.data.role },
     {
       where: {
         groupId: req.params.groupId,
-        userId: res.locals.data.userId,
+        userId: userId,
       },
     },
   );

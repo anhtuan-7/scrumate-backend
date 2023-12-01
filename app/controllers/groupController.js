@@ -8,6 +8,13 @@ const { Group, GroupUser } = require('../models');
 exports.getGroupList = catchAsync(async (req, res, next) => {
   const filter = getFilter(req);
   const { count, rows } = await Group.findAndCountAll({
+    include: {
+      model: GroupUser,
+      as: 'groupUser',
+      where: { userId: res.locals.user.id },
+      attributes: ['role', 'lastAccessed', 'joinedAt'],
+    },
+    attributes: ['id', 'name', 'description'],
     order: [
       [
         { model: GroupUser, as: 'groupUser' },
@@ -17,13 +24,6 @@ exports.getGroupList = catchAsync(async (req, res, next) => {
     ],
     limit: filter.limit,
     offset: filter.skip,
-    include: {
-      model: GroupUser,
-      as: 'groupUser',
-      where: { userId: res.locals.user.id },
-      attributes: ['role', 'lastAccessed', 'joinedAt'],
-    },
-    attributes: ['id', 'name', 'description'],
     raw: true,
     nest: true,
   });
@@ -37,11 +37,9 @@ exports.getGroupList = catchAsync(async (req, res, next) => {
 });
 
 exports.getGroup = catchAsync(async (req, res, next) => {
-  const group = await Group.findByPk(req.params.groupId, {
-    include: [], // projects
-  });
+  const group = await Group.findByPk(req.params.groupId);
   if (!group)
-    return next(new AppError(NOT_FOUND, 'User not found', GROUP_NOT_FOUND));
+    return next(new AppError(NOT_FOUND, 'Group not found', GROUP_NOT_FOUND));
   res.status(OK).json({
     status: 'success',
     data: { group },
