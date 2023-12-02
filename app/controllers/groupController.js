@@ -3,7 +3,7 @@ const AppError = require('../errors/appError');
 const getFilter = require('../utils/apiFilter');
 const { OK, CREATED, NOT_FOUND } = require('../common/statusCode');
 const { GROUP_NOT_FOUND } = require('../common/customCode');
-const { Group, GroupUser } = require('../models');
+const { Group, GroupUser, Project, ProjectUser } = require('../models');
 
 exports.getGroupList = catchAsync(async (req, res, next) => {
   const filter = getFilter(req);
@@ -37,7 +37,26 @@ exports.getGroupList = catchAsync(async (req, res, next) => {
 });
 
 exports.getGroup = catchAsync(async (req, res, next) => {
-  const group = await Group.findByPk(req.params.groupId);
+  const group = await Group.findByPk(req.params.groupId, {
+    include: [
+      {
+        model: Project,
+        attributes: ['id', 'name', 'description'],
+        include: {
+          model: ProjectUser,
+          as: 'projectUser',
+          where: { userId: res.locals.user.id },
+          attributes: ['role', 'joinedAt', 'lastAccessed'],
+        },
+      },
+      {
+        model: GroupUser,
+        as: 'groupUser',
+        where: { userId: res.locals.user.id },
+        attributes: ['role', 'joinedAt', 'lastAccessed'],
+      },
+    ],
+  });
   if (!group)
     return next(new AppError(NOT_FOUND, 'Group not found', GROUP_NOT_FOUND));
   res.status(OK).json({

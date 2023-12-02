@@ -23,7 +23,12 @@ const GroupUser = sequelize.define(
       },
     },
     role: {
-      type: DataTypes.ENUM(['admin', 'project-admin', 'member', 'inactive']),
+      type: DataTypes.ENUM([
+        'group-admin',
+        'project-admin',
+        'member',
+        'inactive',
+      ]),
       allowNull: false,
       defaultValue: 'inactive',
     },
@@ -32,7 +37,6 @@ const GroupUser = sequelize.define(
       allowNull: false,
       defaultValue: DataTypes.NOW,
     },
-    // joinedAt = createdAt
   },
   {
     tableName: 'group_user',
@@ -51,7 +55,7 @@ Group.addHook('afterCreate', async (group) => {
   await GroupUser.create({
     groupId: group.id,
     userId: group.creatorId,
-    role: 'admin',
+    role: 'group-admin',
   });
 });
 

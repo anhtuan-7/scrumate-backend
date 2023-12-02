@@ -1,21 +1,23 @@
 const catchAsync = require('../errors/catchAsync');
 const getFilter = require('../utils/apiFilter');
 const { OK, CREATED } = require('../common/statusCode');
-const { Project, ProjectUser } = require('../models');
+const { Project, ProjectUser, Group } = require('../models');
 
 exports.getProjectList = catchAsync(async (req, res, next) => {
-  const where = {};
-  if (req.params.groupId) where.groupId = req.params.groupId;
-
   const filter = getFilter(req);
   const { count, rows } = await Project.findAndCountAll({
-    where,
-    include: {
-      model: ProjectUser,
-      as: 'projectUser',
-      where: { userId: res.locals.user.id },
-      attributes: ['role', 'lastAccessed', 'joinedAt'],
-    },
+    include: [
+      {
+        model: ProjectUser,
+        as: 'projectUser',
+        where: { userId: res.locals.user.id },
+        attributes: ['role', 'lastAccessed', 'joinedAt'],
+      },
+      {
+        model: Group,
+        attributes: ['name'],
+      },
+    ],
     attributes: ['id', 'name', 'key', 'description', 'repository'],
     order: [
       [
@@ -26,8 +28,6 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
     ],
     limit: filter.limit,
     offset: filter.skip,
-    raw: true,
-    nest: true,
   });
   return res.status(OK).json({
     status: 'success',
