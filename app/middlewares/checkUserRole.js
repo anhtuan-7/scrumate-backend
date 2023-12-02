@@ -10,7 +10,7 @@ const { FORBIDDEN } = require('../common/statusCode');
  * @throws Throws an error if the current user lacks the required role.
  */
 exports.checkUserRoleInGroup = (...roles) => {
-  if (roles.length === 0) roles = ['admin', 'project-admin', 'member'];
+  if (roles.length === 0) roles = ['group-admin', 'project-admin', 'member'];
   return catchAsync(async (req, res, next) => {
     const groupId = req.params.groupId || res.locals.data.groupId;
     const userId = res.locals.user.id;

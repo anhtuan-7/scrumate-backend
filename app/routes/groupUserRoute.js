@@ -16,12 +16,12 @@ router
   .get(checkUserRoleInGroup(), groupUserController.getGroupMember)
   .post(
     validate(addMemberSchema),
-    checkUserRoleInGroup('admin'),
+    checkUserRoleInGroup('group-admin'),
     groupUserController.addGroupMember,
   )
   .patch(
     validate(changeMemberRoleSchema),
-    checkUserRoleInGroup('admin'),
+    checkUserRoleInGroup('group-admin'),
     groupUserController.changeMemberRole,
   );
 

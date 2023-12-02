@@ -13,7 +13,7 @@ router
   .get(projectController.getProjectList)
   .post(
     validate(projectCreateSchema),
-    checkUserRoleInGroup('admin', 'project-admin'),
+    checkUserRoleInGroup('group-admin', 'project-admin'),
     projectController.createProject,
   );
 
