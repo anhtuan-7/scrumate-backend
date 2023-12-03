@@ -1,11 +1,12 @@
 const catchAsync = require('../errors/catchAsync');
+const AppError = require('../errors/appError');
 const getFilter = require('../utils/apiFilter');
-const { OK, CREATED } = require('../common/statusCode');
+const { OK, CREATED, NOT_FOUND } = require('../common/statusCode');
+const { PROJECT_NOT_FOUND } = require('../common/customCode');
 const { Project, ProjectUser, Group } = require('../models');
 
 exports.getProjectList = catchAsync(async (req, res, next) => {
-  const filter = getFilter(req);
-  const { count, rows } = await Project.findAndCountAll({
+  const query = {
     include: [
       {
         model: ProjectUser,
@@ -13,12 +14,20 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
         where: { userId: res.locals.user.id },
         attributes: ['role', 'lastAccessed', 'joinedAt'],
       },
-      {
-        model: Group,
-        attributes: ['name'],
-      },
     ],
     attributes: ['id', 'name', 'key', 'description', 'repository'],
+  };
+  if (req.params.groupId) query.where = { groupId: req.params.groupId };
+  else {
+    query.include.push({
+      model: Group,
+      attributes: ['id', 'name'],
+    });
+  }
+
+  const filter = getFilter(req);
+  const { count, rows } = await Project.findAndCountAll({
+    ...query,
     order: [
       [
         { model: ProjectUser, as: 'projectUser' },
@@ -29,6 +38,7 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
     limit: filter.limit,
     offset: filter.skip,
   });
+
   return res.status(OK).json({
     status: 'success',
     total: count,
@@ -39,7 +49,17 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getProject = catchAsync(async (req, res, next) => {});
+exports.getProject = catchAsync(async (req, res, next) => {
+  const project = await Project.findByPk(req.params.projectId);
+  if (!project)
+    return next(
+      new AppError(NOT_FOUND, 'Project not found', PROJECT_NOT_FOUND),
+    );
+  res.status(OK).json({
+    status: 'success',
+    data: { project },
+  });
+});
 
 exports.createProject = catchAsync(async (req, res, next) => {
   const project = await Project.create({

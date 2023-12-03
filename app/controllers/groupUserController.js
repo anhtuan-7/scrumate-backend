@@ -31,9 +31,7 @@ exports.getGroupMember = catchAsync(async (req, res, next) => {
     status: 'success',
     results: rows.length,
     total: count,
-    data: {
-      members: rows,
-    },
+    data: { members: rows },
   });
 });
 
@@ -56,13 +54,13 @@ exports.addGroupMember = catchAsync(async (req, res, next) => {
 });
 
 exports.changeMemberRole = catchAsync(async (req, res, next) => {
-  const { userId } = res.locals.data;
+  const { userId, role } = res.locals.data;
 
   if (userId === res.locals.user.id)
     return next(new AppError(FORBIDDEN, 'You can not change your own role'));
 
   const affectedRow = await GroupUser.update(
-    { role: res.locals.data.role },
+    { role },
     {
       where: {
         groupId: req.params.groupId,
