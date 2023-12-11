@@ -25,4 +25,11 @@ router
     groupUserController.changeMemberRole,
   );
 
+router
+  .route('/:memberId')
+  .get(
+    checkUserRoleInGroup('group-admin'),
+    groupUserController.getMemberDetail,
+  );
+
 module.exports = router;

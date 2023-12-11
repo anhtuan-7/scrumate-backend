@@ -79,8 +79,12 @@ exports.updateProject = catchAsync(async (req, res, next) => {
   });
   return res.status(OK).json({
     status: 'success',
-    data: {
-      affectedRow,
-    },
+    data: { affectedRow },
+  });
+});
+
+exports.getBacklog = catchAsync(async (re, res, next) => {
+  return res.status(OK).json({
+    status: 'success',
   });
 });

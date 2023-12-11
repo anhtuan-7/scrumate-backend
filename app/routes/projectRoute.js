@@ -17,4 +17,9 @@ router
     projectController.createProject,
   );
 
+router
+  .route('/')
+  .get(projectController.getProject)
+  .patch(projectController.updateProject);
+
 module.exports = router;

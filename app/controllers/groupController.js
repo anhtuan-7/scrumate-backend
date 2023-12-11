@@ -42,6 +42,7 @@ exports.getGroup = catchAsync(async (req, res, next) => {
       model: GroupUser,
       as: 'groupUser',
       attributes: ['role'],
+      where: { userId: res.locals.user.id },
     },
     raw: true,
     nest: true,

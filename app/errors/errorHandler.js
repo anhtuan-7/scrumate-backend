@@ -21,6 +21,7 @@ const handleJwtError = (err) => {
 
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
+    code: err.code,
     status: err.status,
     message: err.message,
     stack: err.stack,

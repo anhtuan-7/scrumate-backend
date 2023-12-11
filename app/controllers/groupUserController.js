@@ -3,7 +3,7 @@ const AppError = require('../errors/appError');
 const getFilter = require('../utils/apiFilter');
 const { OK, CREATED, NOT_FOUND, FORBIDDEN } = require('../common/statusCode');
 const { USER_NOT_FOUND } = require('../common/customCode');
-const { User, GroupUser } = require('../models');
+const { User, GroupUser, Project, ProjectUser } = require('../models');
 
 exports.getGroupMember = catchAsync(async (req, res, next) => {
   const filter = getFilter(req);
@@ -27,11 +27,41 @@ exports.getGroupMember = catchAsync(async (req, res, next) => {
     raw: true,
     nest: true,
   });
-  return res.json({
+  return res.status(OK).json({
     status: 'success',
     results: rows.length,
     total: count,
     data: { members: rows },
+  });
+});
+
+exports.getMemberDetail = catchAsync(async (req, res, next) => {
+  const member = await User.findByPk(req.params.memberId, {
+    include: [
+      {
+        model: GroupUser,
+        as: 'group',
+        where: { groupId: req.params.groupId },
+        attributes: [],
+      },
+      {
+        model: Project,
+        through: {
+          model: ProjectUser,
+          attributes: ['role'],
+        },
+        attributes: ['name'],
+      },
+    ],
+    attributes: ['id', 'name', 'email'],
+  });
+
+  if (!member)
+    return next(new AppError(NOT_FOUND, 'Member not found', USER_NOT_FOUND));
+
+  return res.status(OK).json({
+    status: 'success',
+    data: { member },
   });
 });
 
@@ -70,8 +100,6 @@ exports.changeMemberRole = catchAsync(async (req, res, next) => {
   );
   return res.status(OK).json({
     status: 'success',
-    data: {
-      affectedRow,
-    },
+    data: { affectedRow },
   });
 });
