@@ -33,6 +33,6 @@ const Group = sequelize.define(
 );
 
 User.hasMany(Group, { foreignKey: 'creatorId' });
-Group.belongsTo(User, { as: 'creator', foreignKey: 'creatorId' });
+Group.belongsTo(User, { as: 'groupCreator', foreignKey: 'creatorId' });
 
 module.exports = Group;

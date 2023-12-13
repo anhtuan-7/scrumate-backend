@@ -49,6 +49,18 @@ exports.getGroup = catchAsync(async (req, res, next) => {
   });
   if (!group)
     return next(new AppError(NOT_FOUND, 'Group not found', GROUP_NOT_FOUND));
+
+  // Asynchronous action
+  GroupUser.update(
+    { lastAccessed: new Date() },
+    {
+      where: {
+        groupId: req.params.groupId,
+        userId: res.locals.user.id,
+      },
+    },
+  );
+
   res.status(OK).json({
     status: 'success',
     data: { group },

@@ -57,6 +57,6 @@ Group.hasMany(Project, { foreignKey: 'groupId' });
 Project.belongsTo(Group, { foreignKey: 'groupId' });
 
 User.hasMany(Project, { foreignKey: 'creatorId' });
-Project.belongsTo(User, { as: 'creator', foreignKey: 'creatorId' });
+Project.belongsTo(User, { as: 'projectCreator', foreignKey: 'creatorId' });
 
 module.exports = Project;

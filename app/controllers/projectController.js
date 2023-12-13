@@ -37,6 +37,8 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
     ],
     limit: filter.limit,
     offset: filter.skip,
+    raw: true,
+    nest: true,
   });
 
   return res.status(OK).json({
@@ -50,11 +52,32 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
 });
 
 exports.getProject = catchAsync(async (req, res, next) => {
-  const project = await Project.findByPk(req.params.projectId);
+  const project = await Project.findByPk(req.params.projectId, {
+    include: {
+      model: ProjectUser,
+      as: 'projectUser',
+      where: { userId: res.locals.user.id },
+      attributes: ['role', 'lastAccessed', 'joinedAt'],
+    },
+    attributes: ['id', 'name', 'key'],
+    raw: true,
+    nest: true,
+  });
   if (!project)
     return next(
       new AppError(NOT_FOUND, 'Project not found', PROJECT_NOT_FOUND),
     );
+
+  // Asynchronous action
+  ProjectUser.update(
+    { lastAccessed: new Date() },
+    {
+      where: {
+        projectId: req.params.projectId,
+        userId: res.locals.user.id,
+      },
+    },
+  );
   res.status(OK).json({
     status: 'success',
     data: { project },
@@ -80,11 +103,5 @@ exports.updateProject = catchAsync(async (req, res, next) => {
   return res.status(OK).json({
     status: 'success',
     data: { affectedRow },
-  });
-});
-
-exports.getBacklog = catchAsync(async (re, res, next) => {
-  return res.status(OK).json({
-    status: 'success',
   });
 });

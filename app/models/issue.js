@@ -34,6 +34,7 @@ const Issue = sequelize.define(
         model: Project,
         key: 'id',
       },
+      // onDelete: 'SET NULL', // Default
     },
     type: {
       type: DataTypes.ENUM(['task', 'bug', 'story']),
@@ -43,10 +44,10 @@ const Issue = sequelize.define(
     priority: {
       type: DataTypes.ENUM(['low', 'medium', 'high', 'best-effort']),
       allowNull: false,
-      defaultValue: 'high',
+      defaultValue: 'medium',
     },
     status: {
-      type: DataTypes.ENUM(['to-do', 'in-progress', 'ready-to-review', 'done']),
+      type: DataTypes.ENUM(['to-do', 'in-progress', 'done']),
       allowNull: false,
       defaultValue: 'to-do',
     },
@@ -73,5 +74,8 @@ const Issue = sequelize.define(
 
 Issue.belongsTo(User, { as: 'reporter', foreignKey: 'reporterId' });
 Issue.belongsTo(User, { as: 'assignee', foreignKey: 'assigneeId' });
+
+Project.hasMany(Issue, { foreignKey: 'projectId' });
+Issue.belongsTo(Project, { foreignKey: 'projectId' });
 
 module.exports = Issue;

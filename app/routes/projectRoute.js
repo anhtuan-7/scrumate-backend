@@ -1,8 +1,13 @@
 const express = require('express');
 const projectController = require('../controllers/projectController');
+const issueController = require('../controllers/issueController');
 const validate = require('../validations');
 const { projectCreateSchema } = require('../validations/projectSchema');
-const { checkUserRoleInGroup, verifyToken } = require('../middlewares');
+const {
+  checkUserRoleInGroup,
+  checkUserRoleInProject,
+  verifyToken,
+} = require('../middlewares');
 
 const router = express.Router({ mergeParams: true });
 
@@ -18,8 +23,13 @@ router
   );
 
 router
-  .route('/')
-  .get(projectController.getProject)
+  .route('/:projectId')
+  .get(checkUserRoleInProject(), projectController.getProject)
   .patch(projectController.updateProject);
+
+router
+  .route('/:projectId/issues')
+  .get(issueController.getBacklog)
+  .post(issueController.createIssue);
 
 module.exports = router;

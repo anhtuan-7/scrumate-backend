@@ -27,7 +27,6 @@ const Sprint = sequelize.define(
     },
     projectId: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
       references: {
         model: Project,
         key: 'id',
@@ -46,5 +45,11 @@ const Sprint = sequelize.define(
     tableName: 'sprint',
   },
 );
+
+Project.hasMany(Sprint, { foreignKey: 'projectId' });
+Sprint.belongsTo(Project, { foreignKey: 'projectId' });
+
+User.hasMany(Project, { as: 'creator', foreignKey: 'creatorId' });
+Project.belongsTo(User, { as: 'creator', foreignKey: 'creatorId' });
 
 module.exports = Sprint;
