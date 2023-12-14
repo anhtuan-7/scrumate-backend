@@ -1,11 +1,11 @@
 const express = require('express');
+const groupUserController = require('../controllers/groupUserController');
+const { verifyToken, checkUserRoleInGroup } = require('../middlewares');
 const validate = require('../validations');
 const {
   addMemberSchema,
   changeMemberRoleSchema,
 } = require('../validations/groupSchema');
-const { verifyToken, checkUserRoleInGroup } = require('../middlewares');
-const groupUserController = require('../controllers/groupUserController');
 
 const router = express.Router({ mergeParams: true });
 

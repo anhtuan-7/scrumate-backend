@@ -3,6 +3,7 @@ const groupController = require('../controllers/groupController');
 const validate = require('../validations');
 const { groupCreateSchema } = require('../validations/groupSchema');
 const { checkUserRoleInGroup, verifyToken } = require('../middlewares');
+
 const groupUserRoute = require('./groupUserRoute');
 const projectRoute = require('./projectRoute');
 

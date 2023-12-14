@@ -7,7 +7,7 @@ const { USER_NOT_FOUND } = require('../common/customCode');
 exports.getUser = catchAsync(async (req, res, next) => {
   const user = await User.findOne({
     where: { email: req.query.email },
-    attributes: ['email', 'name', 'avatar'],
+    attributes: ['id', 'email', 'name', 'avatar'],
   });
 
   if (!user)
