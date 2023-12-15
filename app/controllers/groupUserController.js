@@ -35,6 +35,24 @@ exports.getGroupMember = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.addGroupMember = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({ where: { email: res.locals.data.email } });
+  if (!user)
+    return next(new AppError(NOT_FOUND, 'User not found', USER_NOT_FOUND));
+
+  const member = await GroupUser.create({
+    userId: user.id,
+    groupId: req.params.groupId,
+    role: res.locals.data.role,
+  });
+  return res.status(CREATED).json({
+    status: 'success',
+    data: {
+      member,
+    },
+  });
+});
+
 exports.getMemberDetail = catchAsync(async (req, res, next) => {
   const member = await User.findByPk(req.params.memberId, {
     include: [
@@ -61,22 +79,6 @@ exports.getMemberDetail = catchAsync(async (req, res, next) => {
 
   return res.status(OK).json({
     status: 'success',
-    data: { member },
-  });
-});
-
-exports.addGroupMember = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ where: { email: res.locals.data.email } });
-  if (!user)
-    return next(new AppError(NOT_FOUND, 'User not found', USER_NOT_FOUND));
-
-  const member = await GroupUser.create({
-    userId: user.id,
-    groupId: req.params.groupId,
-    role: res.locals.data.role,
-  });
-  return res.status(CREATED).json({
-    status: 'success',
     data: {
       member,
     },
@@ -84,22 +86,19 @@ exports.addGroupMember = catchAsync(async (req, res, next) => {
 });
 
 exports.changeMemberRole = catchAsync(async (req, res, next) => {
-  const { userId, role } = res.locals.data;
+  const { memberId: userId, groupId } = req.params;
 
   if (userId === res.locals.user.id)
     return next(new AppError(FORBIDDEN, 'You can not change your own role'));
 
   const affectedRow = await GroupUser.update(
-    { role },
-    {
-      where: {
-        groupId: req.params.groupId,
-        userId: userId,
-      },
-    },
+    { ...res.locals.data },
+    { where: { groupId, userId } },
   );
   return res.status(OK).json({
     status: 'success',
-    data: { affectedRow },
+    data: {
+      affectedRow,
+    },
   });
 });

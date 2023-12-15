@@ -23,7 +23,12 @@ const ProjectUser = sequelize.define(
       },
     },
     role: {
-      type: DataTypes.ENUM(['product-owner', 'scrum-master', 'developer']),
+      type: DataTypes.ENUM([
+        'product-owner',
+        'scrum-master',
+        'developer',
+        'inactive',
+      ]),
       allowNull: false,
       defaultValue: 'developer',
     },

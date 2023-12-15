@@ -18,18 +18,15 @@ router
     validate(addMemberSchema),
     checkUserRoleInGroup('group-admin'),
     groupUserController.addGroupMember,
-  )
-  .patch(
-    validate(changeMemberRoleSchema),
-    checkUserRoleInGroup('group-admin'),
-    groupUserController.changeMemberRole,
   );
 
 router
   .route('/:memberId')
-  .get(
+  .get(checkUserRoleInGroup('group-admin'), groupUserController.getMemberDetail)
+  .patch(
+    validate(changeMemberRoleSchema),
     checkUserRoleInGroup('group-admin'),
-    groupUserController.getMemberDetail,
+    groupUserController.changeMemberRole,
   );
 
 module.exports = router;

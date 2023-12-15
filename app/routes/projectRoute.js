@@ -9,10 +9,13 @@ const {
 } = require('../middlewares');
 
 const issueRoute = require('./issueRoute');
+const sprintRoute = require('./sprintRoute');
 
 const router = express.Router({ mergeParams: true });
 
 router.use('/:projectId/issues', issueRoute);
+router.use('/:projectId/sprints', sprintRoute);
+
 router.use(verifyToken);
 
 router

@@ -11,13 +11,9 @@ const addMemberSchema = Joi.object({
 });
 
 const changeMemberRoleSchema = Joi.object({
-  userId: Joi.number().required(),
-  role: Joi.string().valid(
-    'member',
-    'group-admin',
-    'project-admin',
-    'inactive',
-  ),
+  role: Joi.string()
+    .valid('member', 'group-admin', 'project-admin', 'inactive')
+    .required(),
 });
 
 module.exports = { groupCreateSchema, addMemberSchema, changeMemberRoleSchema };

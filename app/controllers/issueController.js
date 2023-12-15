@@ -1,4 +1,4 @@
-const { OK, CREATED, NOT_FOUND } = require('../common/statusCode');
+const { OK, CREATED, NOT_FOUND, NO_CONTENT } = require('../common/statusCode');
 const catchAsync = require('../errors/catchAsync');
 const AppError = require('../errors/appError');
 const { Issue, Sprint } = require('../models');
@@ -45,5 +45,17 @@ exports.createIssue = catchAsync(async (req, res, next) => {
     data: {
       issue,
     },
+  });
+});
+
+exports.getIssue = catchAsync(async (req, res, next) => {});
+exports.updateIssue = catchAsync(async (req, res, next) => {});
+
+exports.deleteIssue = catchAsync(async (req, res, next) => {
+  const { issueId } = req.params;
+  await Issue.destroy({ where: { id: issueId } });
+  return res.status(NO_CONTENT).json({
+    status: 'success',
+    data: {},
   });
 });
