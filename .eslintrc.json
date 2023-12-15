@@ -18,6 +18,11 @@
     "class-methods-use-this": "off",
     "arrow-body-style": "off",
     "prefer-destructuring": ["error", { "object": true, "array": false }],
-    "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }]
+    "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val" }],
+    "padding-line-between-statements": [
+      "error",
+      { "blankLine": "always", "prev": "*", "next": "exports" }
+    ],
+    "no-multiple-empty-lines": ["error", { "max": 2 }]
   }
 }

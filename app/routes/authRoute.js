@@ -22,12 +22,12 @@ router.post(
 router.get('/logout', authController.logout);
 
 router.get('/verify', verifyToken, (req, res) => {
-  const { user } = res.locals;
-  user.password = undefined;
+  const { id, name, email } = res.locals.user;
+
   res.status(OK).json({
     status: 'success',
     data: {
-      user,
+      user: { id, name, email },
     },
   });
 });

@@ -46,10 +46,12 @@ const sendErrorProd = (err, res) => {
 const errorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
+
   // if (process.env.NODE_ENV === 'development') return sendErrorDev(err, res);
   if (err instanceof Sequelize.BaseError) err = handlePostgresError(err);
   if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError')
     err = handleJwtError(err);
+
   if (process.env.NODE_ENV === 'development') return sendErrorDev(err, res);
   sendErrorProd(err, res);
 };

@@ -1,17 +1,19 @@
+const { Group, GroupUser } = require('../models');
 const catchAsync = require('../errors/catchAsync');
 const AppError = require('../errors/appError');
 const getFilter = require('../utils/apiFilter');
 const { OK, CREATED, NOT_FOUND } = require('../common/statusCode');
 const { GROUP_NOT_FOUND } = require('../common/customCode');
-const { Group, GroupUser } = require('../models');
 
 exports.getGroupList = catchAsync(async (req, res, next) => {
   const filter = getFilter(req);
+  const { user } = res.locals;
+
   const { count, rows } = await Group.findAndCountAll({
     include: {
       model: GroupUser,
       as: 'groupUser',
-      where: { userId: res.locals.user.id },
+      where: { userId: user.id },
       attributes: ['role', 'lastAccessed', 'joinedAt'],
     },
     attributes: ['id', 'name', 'description'],
@@ -37,12 +39,15 @@ exports.getGroupList = catchAsync(async (req, res, next) => {
 });
 
 exports.getGroup = catchAsync(async (req, res, next) => {
-  const group = await Group.findByPk(req.params.groupId, {
+  const { groupId } = req.params;
+  const { user } = res.locals;
+
+  const group = await Group.findByPk(groupId, {
     include: {
       model: GroupUser,
       as: 'groupUser',
       attributes: ['role'],
-      where: { userId: res.locals.user.id },
+      where: { userId: user.id },
     },
     raw: true,
     nest: true,
@@ -53,27 +58,29 @@ exports.getGroup = catchAsync(async (req, res, next) => {
   // Asynchronous action
   GroupUser.update(
     { lastAccessed: new Date() },
-    {
-      where: {
-        groupId: req.params.groupId,
-        userId: res.locals.user.id,
-      },
-    },
+    { where: { groupId, userId: user.id } },
   );
 
   res.status(OK).json({
     status: 'success',
-    data: { group },
+    data: {
+      group,
+    },
   });
 });
 
 exports.createGroup = catchAsync(async (req, res, next) => {
+  const { data, user } = res.locals;
+
   const group = await Group.create({
-    ...res.locals.data,
-    creatorId: res.locals.user.id,
+    ...data,
+    creatorId: user.id,
   });
+
   res.status(CREATED).json({
     status: 'success',
-    data: { group },
+    data: {
+      group,
+    },
   });
 });

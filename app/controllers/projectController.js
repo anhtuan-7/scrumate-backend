@@ -1,33 +1,16 @@
+const { Project, ProjectUser, Group } = require('../models');
 const catchAsync = require('../errors/catchAsync');
 const AppError = require('../errors/appError');
 const getFilter = require('../utils/apiFilter');
 const { OK, CREATED, NOT_FOUND } = require('../common/statusCode');
 const { PROJECT_NOT_FOUND } = require('../common/customCode');
-const { Project, ProjectUser, Group } = require('../models');
 
 exports.getProjectList = catchAsync(async (req, res, next) => {
-  const query = {
-    include: [
-      {
-        model: ProjectUser,
-        as: 'projectUser',
-        where: { userId: res.locals.user.id },
-        attributes: ['role', 'lastAccessed', 'joinedAt'],
-      },
-    ],
-    attributes: ['id', 'name', 'key', 'description', 'repository'],
-  };
-  if (req.params.groupId) query.where = { groupId: req.params.groupId };
-  else {
-    query.include.push({
-      model: Group,
-      attributes: ['id', 'name'],
-    });
-  }
-
   const filter = getFilter(req);
-  const { count, rows } = await Project.findAndCountAll({
-    ...query,
+  const { groupId } = req.params;
+  const { user } = res.locals;
+
+  const query = {
     order: [
       [
         { model: ProjectUser, as: 'projectUser' },
@@ -35,12 +18,30 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
         filter.order,
       ],
     ],
+    include: [
+      {
+        model: ProjectUser,
+        as: 'projectUser',
+        where: { userId: user.id },
+        attributes: ['role', 'lastAccessed', 'joinedAt'],
+      },
+    ],
+    attributes: ['id', 'name', 'key', 'description', 'repository'],
     limit: filter.limit,
     offset: filter.skip,
     raw: true,
     nest: true,
-  });
+  };
 
+  if (groupId) query.where = { groupId };
+  else {
+    query.include.push({
+      model: Group,
+      attributes: ['id', 'name'],
+    });
+  }
+
+  const { count, rows } = await Project.findAndCountAll(query);
   return res.status(OK).json({
     status: 'success',
     total: count,
@@ -52,17 +53,21 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
 });
 
 exports.getProject = catchAsync(async (req, res, next) => {
-  const project = await Project.findByPk(req.params.projectId, {
+  const { projectId } = req.params;
+  const { user } = res.locals;
+
+  const project = await Project.findByPk(projectId, {
     include: {
       model: ProjectUser,
       as: 'projectUser',
-      where: { userId: res.locals.user.id },
+      where: { userId: user.id },
       attributes: ['role', 'lastAccessed', 'joinedAt'],
     },
     attributes: ['id', 'name', 'key'],
     raw: true,
     nest: true,
   });
+
   if (!project)
     return next(
       new AppError(NOT_FOUND, 'Project not found', PROJECT_NOT_FOUND),
@@ -71,37 +76,47 @@ exports.getProject = catchAsync(async (req, res, next) => {
   // Asynchronous action
   ProjectUser.update(
     { lastAccessed: new Date() },
-    {
-      where: {
-        projectId: req.params.projectId,
-        userId: res.locals.user.id,
-      },
-    },
+    { where: { projectId, userId: user.id } },
   );
+
   res.status(OK).json({
     status: 'success',
-    data: { project },
+    data: {
+      project,
+    },
   });
 });
 
 exports.createProject = catchAsync(async (req, res, next) => {
+  const { groupId } = req.params;
+  const { user, data } = res.locals;
+
   const project = await Project.create({
-    ...res.locals.data,
-    groupId: req.params.groupId,
-    creatorId: res.locals.user.id,
+    ...data,
+    groupId,
+    creatorId: user.id,
   });
+
   res.status(CREATED).json({
     status: 'success',
-    data: { project },
+    data: {
+      project,
+    },
   });
 });
 
 exports.updateProject = catchAsync(async (req, res, next) => {
-  const affectedRow = await Project.update(res.locals.data, {
-    where: { id: req.params.projectId },
+  const { projectId } = req.params;
+  const { data } = res.locals;
+
+  const affectedRow = await Project.update(data, {
+    where: { id: projectId },
   });
+
   return res.status(OK).json({
     status: 'success',
-    data: { affectedRow },
+    data: {
+      affectedRow,
+    },
   });
 });

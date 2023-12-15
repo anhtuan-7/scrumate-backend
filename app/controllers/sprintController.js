@@ -1,11 +1,14 @@
-const { OK, CREATED } = require('../common/statusCode');
-const catchAsync = require('../errors/catchAsync');
 const { Sprint } = require('../models');
+const catchAsync = require('../errors/catchAsync');
+const { OK, CREATED } = require('../common/statusCode');
 
 exports.getSprintList = catchAsync(async (req, res, next) => {
+  const { projectId } = req.params;
+
   const sprints = await Sprint.findAll({
-    where: { projectId: req.params.projectId },
+    where: { projectId },
   });
+
   return res.status(OK).json({
     status: 'success',
     data: {
@@ -15,10 +18,13 @@ exports.getSprintList = catchAsync(async (req, res, next) => {
 });
 
 exports.createSprint = catchAsync(async (req, res, next) => {
+  const { projectId } = req.params;
+  const { user, data } = res.locals;
+
   const sprint = await Sprint.create({
-    ...res.locals.data,
-    projectId: req.params.projectId,
-    creatorId: req.locals.user.id,
+    ...data,
+    projectId,
+    creatorId: user.id,
   });
 
   return res.status(CREATED).json({

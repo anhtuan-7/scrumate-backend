@@ -10,19 +10,28 @@ const { FORBIDDEN } = require('../common/statusCode');
  * @throws Throws an error if the current user lacks the required role.
  */
 exports.checkUserRoleInGroup = (...roles) => {
-  if (roles.length === 0) roles = ['group-admin', 'project-admin', 'member'];
-  return catchAsync(async (req, res, next) => {
-    const groupId = req.params.groupId || res.locals.data.groupId;
-    const userId = res.locals.user.id;
+  if (roles.length === 0) {
+    roles = ['group-admin', 'project-admin', 'member'];
+  }
 
-    const data = await GroupUser.findOne({ where: { userId, groupId } });
-    if (data && roles.includes(data.role)) return next();
-    return next(
-      new AppError(
-        FORBIDDEN,
-        'You do not have permission to perform this action',
-      ),
-    );
+  return catchAsync(async (req, res, next) => {
+    const { groupId } = req.params;
+    const { user } = res.locals;
+
+    const result = await GroupUser.findOne({
+      where: { userId: user.id, groupId },
+    });
+
+    if (!result || !roles.includes(result.role)) {
+      return next(
+        new AppError(
+          FORBIDDEN,
+          'You do not have permission to perform this action',
+        ),
+      );
+    }
+
+    next();
   });
 };
 
@@ -33,19 +42,27 @@ exports.checkUserRoleInGroup = (...roles) => {
  * @throws Throws an error if the current user lacks the required role.
  */
 exports.checkUserRoleInProject = (...roles) => {
-  if (roles.length === 0)
+  if (roles.length === 0) {
     roles = ['scrum-master', 'product-owner', 'developer'];
-  return catchAsync(async (req, res, next) => {
-    const projectId = req.params.projectId || res.locals.data.projectId;
-    const userId = res.locals.user.id;
+  }
 
-    const data = await ProjectUser.findOne({ where: { userId, projectId } });
-    if (data && roles.includes(data.role)) return next();
-    return next(
-      new AppError(
-        FORBIDDEN,
-        'You do not have permission to perform this action',
-      ),
-    );
+  return catchAsync(async (req, res, next) => {
+    const { projectId } = req.params;
+    const { user } = res.locals;
+
+    const result = await ProjectUser.findOne({
+      where: { userId: user.id, projectId },
+    });
+
+    if (!result || !roles.includes(result.role)) {
+      return next(
+        new AppError(
+          FORBIDDEN,
+          'You do not have permission to perform this action',
+        ),
+      );
+    }
+
+    next();
   });
 };

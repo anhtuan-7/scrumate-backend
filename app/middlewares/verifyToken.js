@@ -1,11 +1,11 @@
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const AppError = require('../errors/appError');
 const User = require('../models/user');
 const catchAsync = require('../errors/catchAsync');
+const AppError = require('../errors/appError');
 const { hasPasswordChanged } = require('../utils/auth');
-const { USER_NOT_FOUND } = require('../common/customCode');
 const { UNAUTHORIZED, NOT_FOUND } = require('../common/statusCode');
+const { USER_NOT_FOUND, INVALID_TOKEN } = require('../common/customCode');
 
 const verifyToken = catchAsync(async (req, res, next) => {
   const token = req.cookies.jwt;
@@ -17,6 +17,7 @@ const verifyToken = catchAsync(async (req, res, next) => {
         40101,
       ),
     );
+
   const decodedPayload = await promisify(jwt.verify)(
     token,
     process.env.JWT_SECRET,
@@ -33,7 +34,7 @@ const verifyToken = catchAsync(async (req, res, next) => {
       new AppError(
         UNAUTHORIZED,
         'User has recently changed password! Please log in again',
-        40102,
+        INVALID_TOKEN,
       ),
     );
 
