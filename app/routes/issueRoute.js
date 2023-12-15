@@ -17,4 +17,12 @@ router
     issueController.createIssue,
   );
 
+// router.use(checkUserRoleInProject('developer'));
+
+router
+  .route('/:issueId')
+  .get(issueController.getIssue)
+  .patch(issueController.updateIssue)
+  .delete(issueController.deleteIssue);
+
 module.exports = router;

@@ -101,7 +101,7 @@ exports.changeMemberRole = catchAsync(async (req, res, next) => {
   if (userId === user.id)
     return next(new AppError(FORBIDDEN, 'You can not change your own role'));
 
-  const affectedRow = await GroupUser.update(
+  const [affectedCount] = await GroupUser.update(
     { ...data },
     { where: { groupId, userId } },
   );
@@ -109,7 +109,7 @@ exports.changeMemberRole = catchAsync(async (req, res, next) => {
   return res.status(OK).json({
     status: 'success',
     data: {
-      affectedRow,
+      affectedCount,
     },
   });
 });

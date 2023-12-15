@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { Project, ProjectUser, Group } = require('../models');
 const catchAsync = require('../errors/catchAsync');
 const AppError = require('../errors/appError');
@@ -22,7 +23,10 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
       {
         model: ProjectUser,
         as: 'projectUser',
-        where: { userId: user.id },
+        where: {
+          userId: user.id,
+          role: { [Op.ne]: 'inactive' },
+        },
         attributes: ['role', 'lastAccessed', 'joinedAt'],
       },
     ],
@@ -42,12 +46,31 @@ exports.getProjectList = catchAsync(async (req, res, next) => {
   }
 
   const { count, rows } = await Project.findAndCountAll(query);
+
   return res.status(OK).json({
     status: 'success',
     total: count,
     results: rows.length,
     data: {
       projects: rows,
+    },
+  });
+});
+
+exports.createProject = catchAsync(async (req, res, next) => {
+  const { groupId } = req.params;
+  const { user, data } = res.locals;
+
+  const project = await Project.create({
+    ...data,
+    groupId,
+    creatorId: user.id,
+  });
+
+  res.status(CREATED).json({
+    status: 'success',
+    data: {
+      project,
     },
   });
 });
@@ -60,7 +83,6 @@ exports.getProject = catchAsync(async (req, res, next) => {
     include: {
       model: ProjectUser,
       as: 'projectUser',
-      where: { userId: user.id },
       attributes: ['role', 'lastAccessed', 'joinedAt'],
     },
     attributes: ['id', 'name', 'key'],
@@ -80,24 +102,6 @@ exports.getProject = catchAsync(async (req, res, next) => {
   );
 
   res.status(OK).json({
-    status: 'success',
-    data: {
-      project,
-    },
-  });
-});
-
-exports.createProject = catchAsync(async (req, res, next) => {
-  const { groupId } = req.params;
-  const { user, data } = res.locals;
-
-  const project = await Project.create({
-    ...data,
-    groupId,
-    creatorId: user.id,
-  });
-
-  res.status(CREATED).json({
     status: 'success',
     data: {
       project,

@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { Group, GroupUser } = require('../models');
 const catchAsync = require('../errors/catchAsync');
 const AppError = require('../errors/appError');
@@ -10,13 +11,6 @@ exports.getGroupList = catchAsync(async (req, res, next) => {
   const { user } = res.locals;
 
   const { count, rows } = await Group.findAndCountAll({
-    include: {
-      model: GroupUser,
-      as: 'groupUser',
-      where: { userId: user.id },
-      attributes: ['role', 'lastAccessed', 'joinedAt'],
-    },
-    attributes: ['id', 'name', 'description'],
     order: [
       [
         { model: GroupUser, as: 'groupUser' },
@@ -24,6 +18,16 @@ exports.getGroupList = catchAsync(async (req, res, next) => {
         filter.order,
       ],
     ],
+    include: {
+      model: GroupUser,
+      as: 'groupUser',
+      where: {
+        userId: user.id,
+        role: { [Op.ne]: 'inactive' },
+      },
+      attributes: ['role', 'lastAccessed', 'joinedAt'],
+    },
+    attributes: ['id', 'name', 'description'],
     limit: filter.limit,
     offset: filter.skip,
     raw: true,
@@ -47,7 +51,6 @@ exports.getGroup = catchAsync(async (req, res, next) => {
       model: GroupUser,
       as: 'groupUser',
       attributes: ['role'],
-      where: { userId: user.id },
     },
     raw: true,
     nest: true,
