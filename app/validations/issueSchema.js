@@ -13,19 +13,11 @@ const issueUpdateSchema = Joi.object({
   type: Joi.string().valid('task', 'bug', 'story'),
   priority: Joi.string().valid('low', 'medium', 'high', 'best-effort'),
   status: Joi.string().valid('to-do', 'in-progress', 'done'),
-});
-
-const issueSprintUpdateSchema = Joi.object({
-  sprintId: Joi.number().required(),
-});
-
-const issueAssigneeUpdateSchema = Joi.object({
-  asigneeId: Joi.number().required(),
+  sprintId: Joi.number(),
+  asigneeId: Joi.number().allow(null),
 });
 
 module.exports = {
   issueCreateSchema,
   issueUpdateSchema,
-  issueSprintUpdateSchema,
-  issueAssigneeUpdateSchema,
 };

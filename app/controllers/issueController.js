@@ -11,6 +11,18 @@ exports.getBacklog = catchAsync(async (req, res, next) => {
       projectId,
       sprintId: sprintId || null, // Sprint Backlog || Product Backlog
     },
+    include: [
+      {
+        model: User,
+        as: 'assignee',
+        attributes: ['id', 'name', 'email', 'avatar'],
+      },
+      {
+        model: User,
+        as: 'reporter',
+        attributes: ['id', 'name', 'email', 'avatar'],
+      },
+    ],
   });
   return res.status(OK).json({
     status: 'success',
