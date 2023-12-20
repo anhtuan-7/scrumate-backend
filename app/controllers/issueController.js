@@ -23,7 +23,7 @@ exports.getBacklog = catchAsync(async (req, res, next) => {
         attributes: ['id', 'name', 'email', 'avatar'],
       },
     ],
-    order: [['createdAt', 'desc']],
+    order: [['createdAt', 'asc']],
   });
   return res.status(OK).json({
     status: 'success',
