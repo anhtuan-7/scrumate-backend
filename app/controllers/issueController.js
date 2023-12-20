@@ -102,8 +102,6 @@ exports.updateIssue = catchAsync(async (req, res, next) => {
   const { issueId, projectId } = req.params;
   const { data } = res.locals;
 
-  console.log(data);
-
   const [affectedCount] = await Issue.update(data, {
     where: {
       id: issueId,

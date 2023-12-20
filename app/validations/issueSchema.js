@@ -13,7 +13,7 @@ const issueUpdateSchema = Joi.object({
   type: Joi.string().valid('task', 'bug', 'story'),
   priority: Joi.string().valid('low', 'medium', 'high', 'best-effort'),
   status: Joi.string().valid('to-do', 'in-progress', 'done'),
-  sprintId: Joi.number(),
+  sprintId: Joi.number().allow(null),
   assigneeId: Joi.number().allow(null),
 });
 
