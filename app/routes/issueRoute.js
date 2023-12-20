@@ -1,7 +1,10 @@
 const express = require('express');
 const issueController = require('../controllers/issueController');
 const validate = require('../validations');
-const { issueCreateSchema } = require('../validations/issueSchema');
+const {
+  issueCreateSchema,
+  issueUpdateSchema,
+} = require('../validations/issueSchema');
 const { checkUserRoleInProject, verifyToken } = require('../middlewares');
 
 const router = express.Router({ mergeParams: true });
@@ -22,7 +25,7 @@ router
 router
   .route('/:issueId')
   .get(issueController.getIssue)
-  .patch(issueController.updateIssue)
+  .patch(validate(issueUpdateSchema), issueController.updateIssue)
   .delete(issueController.deleteIssue);
 
 module.exports = router;

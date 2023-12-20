@@ -23,6 +23,7 @@ exports.getBacklog = catchAsync(async (req, res, next) => {
         attributes: ['id', 'name', 'email', 'avatar'],
       },
     ],
+    order: [['createdAt', 'desc']],
   });
   return res.status(OK).json({
     status: 'success',
@@ -100,6 +101,8 @@ exports.getIssue = catchAsync(async (req, res, next) => {
 exports.updateIssue = catchAsync(async (req, res, next) => {
   const { issueId, projectId } = req.params;
   const { data } = res.locals;
+
+  console.log(data);
 
   const [affectedCount] = await Issue.update(data, {
     where: {
