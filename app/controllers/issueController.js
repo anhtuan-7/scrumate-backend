@@ -124,8 +124,5 @@ exports.deleteIssue = catchAsync(async (req, res, next) => {
     where: { id: issueId, projectId },
   });
 
-  return res.status(NO_CONTENT).json({
-    status: 'success',
-    data: {},
-  });
+  return res.status(NO_CONTENT).json();
 });
