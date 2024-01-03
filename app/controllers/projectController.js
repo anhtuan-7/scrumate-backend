@@ -84,8 +84,9 @@ exports.getProject = catchAsync(async (req, res, next) => {
       model: ProjectUser,
       as: 'projectUser',
       attributes: ['role', 'lastAccessed', 'joinedAt'],
+      where: { userId: user.id },
     },
-    attributes: ['id', 'name', 'key'],
+    attributes: ['id', 'name', 'key', 'groupId'],
     raw: true,
     nest: true,
   });

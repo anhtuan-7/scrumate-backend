@@ -4,7 +4,7 @@ const { verifyToken, checkUserRoleInGroup } = require('../middlewares');
 const validate = require('../validations');
 const {
   addMemberSchema,
-  changeMemberRoleSchema,
+  updateRoleSchema,
 } = require('../validations/groupSchema');
 
 const router = express.Router({ mergeParams: true });
@@ -13,20 +13,20 @@ router.use(verifyToken);
 
 router
   .route('/')
-  .get(checkUserRoleInGroup(), groupUserController.getGroupMember)
+  .get(checkUserRoleInGroup(), groupUserController.getGroupUserList)
   .post(
     validate(addMemberSchema),
     checkUserRoleInGroup('group-admin'),
-    groupUserController.addGroupMember,
+    groupUserController.addGroupUser,
   );
 
 router
-  .route('/:memberId')
-  .get(checkUserRoleInGroup('group-admin'), groupUserController.getMemberDetail)
+  .route('/:userId')
+  .get(checkUserRoleInGroup('group-admin'), groupUserController.getGroupUser)
   .patch(
-    validate(changeMemberRoleSchema),
+    validate(updateRoleSchema),
     checkUserRoleInGroup('group-admin'),
-    groupUserController.changeMemberRole,
+    groupUserController.updateRole,
   );
 
 module.exports = router;

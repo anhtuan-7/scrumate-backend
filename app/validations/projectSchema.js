@@ -14,4 +14,25 @@ const projectUpdateSchema = Joi.object({
   repository: Joi.string().uri().allow(null, ''),
 });
 
-module.exports = { projectCreateSchema, projectUpdateSchema };
+const addMemberSchema = Joi.object({
+  email: Joi.string().email().required(),
+  role: Joi.string().valid(
+    'product-owner',
+    'scrum-master',
+    'developer',
+    'inactive',
+  ),
+});
+
+const updateRoleSchema = Joi.object({
+  role: Joi.string()
+    .valid('product-owner', 'scrum-master', 'developer', 'inactive')
+    .required(),
+});
+
+module.exports = {
+  projectCreateSchema,
+  projectUpdateSchema,
+  addMemberSchema,
+  updateRoleSchema,
+};

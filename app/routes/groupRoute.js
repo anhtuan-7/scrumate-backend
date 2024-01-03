@@ -9,7 +9,7 @@ const projectRoute = require('./projectRoute');
 
 const router = express.Router();
 
-router.use('/:groupId/members', groupUserRoute);
+router.use('/:groupId/users', groupUserRoute);
 router.use('/:groupId/projects', projectRoute);
 
 router.use(verifyToken);

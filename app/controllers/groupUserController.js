@@ -5,7 +5,7 @@ const getFilter = require('../utils/apiFilter');
 const { OK, CREATED, NOT_FOUND, FORBIDDEN } = require('../common/statusCode');
 const { USER_NOT_FOUND } = require('../common/customCode');
 
-exports.getGroupMember = catchAsync(async (req, res, next) => {
+exports.getGroupUserList = catchAsync(async (req, res, next) => {
   const filter = getFilter(req);
   const { groupId } = req.params;
 
@@ -39,7 +39,7 @@ exports.getGroupMember = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.addGroupMember = catchAsync(async (req, res, next) => {
+exports.addGroupUser = catchAsync(async (req, res, next) => {
   const { groupId } = req.params;
   const { data } = res.locals;
 
@@ -47,7 +47,7 @@ exports.addGroupMember = catchAsync(async (req, res, next) => {
   if (!user)
     return next(new AppError(NOT_FOUND, 'User not found', USER_NOT_FOUND));
 
-  const member = await GroupUser.create({
+  const groupUser = await GroupUser.create({
     userId: user.id,
     groupId,
     role: data.role,
@@ -55,15 +55,15 @@ exports.addGroupMember = catchAsync(async (req, res, next) => {
   return res.status(CREATED).json({
     status: 'success',
     data: {
-      member,
+      member: groupUser,
     },
   });
 });
 
-exports.getMemberDetail = catchAsync(async (req, res, next) => {
-  const { groupId, memberId } = req.params;
+exports.getGroupUser = catchAsync(async (req, res, next) => {
+  const { groupId, userId } = req.params;
 
-  const member = await User.findByPk(memberId, {
+  const user = await User.findByPk(userId, {
     include: [
       {
         model: GroupUser,
@@ -83,22 +83,22 @@ exports.getMemberDetail = catchAsync(async (req, res, next) => {
     attributes: ['id', 'name', 'email'],
   });
 
-  if (!member)
+  if (!user)
     return next(new AppError(NOT_FOUND, 'Member not found', USER_NOT_FOUND));
 
   return res.status(OK).json({
     status: 'success',
     data: {
-      member,
+      member: user,
     },
   });
 });
 
-exports.changeMemberRole = catchAsync(async (req, res, next) => {
-  const { memberId: userId, groupId } = req.params;
+exports.updateRole = catchAsync(async (req, res, next) => {
+  const { userId, groupId } = req.params;
   const { user, data } = res.locals;
 
-  if (userId === user.id)
+  if (parseInt(userId, 10) === user.id)
     return next(new AppError(FORBIDDEN, 'You can not change your own role'));
 
   const [affectedCount] = await GroupUser.update(

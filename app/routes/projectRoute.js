@@ -10,11 +10,13 @@ const {
 
 const issueRoute = require('./issueRoute');
 const sprintRoute = require('./sprintRoute');
+const projectUserRoute = require('./projectUserRoute');
 
 const router = express.Router({ mergeParams: true });
 
 router.use('/:projectId/issues', issueRoute);
 router.use('/:projectId/sprints', sprintRoute);
+router.use('/:projectId/users', projectUserRoute);
 
 router.use(verifyToken);
 

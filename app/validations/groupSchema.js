@@ -7,13 +7,18 @@ const groupCreateSchema = Joi.object({
 
 const addMemberSchema = Joi.object({
   email: Joi.string().email().required(),
-  role: Joi.string().valid('member', 'group-admin', 'project-admin'),
+  role: Joi.string().valid(
+    'member',
+    'group-admin',
+    'project-admin',
+    'inactive',
+  ),
 });
 
-const changeMemberRoleSchema = Joi.object({
+const updateRoleSchema = Joi.object({
   role: Joi.string()
     .valid('member', 'group-admin', 'project-admin', 'inactive')
     .required(),
 });
 
-module.exports = { groupCreateSchema, addMemberSchema, changeMemberRoleSchema };
+module.exports = { groupCreateSchema, addMemberSchema, updateRoleSchema };
