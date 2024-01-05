@@ -78,4 +78,7 @@ Issue.belongsTo(User, { as: 'assignee', foreignKey: 'assigneeId' });
 Project.hasMany(Issue, { foreignKey: 'projectId' });
 Issue.belongsTo(Project, { foreignKey: 'projectId' });
 
+Sprint.hasMany(Issue, { foreignKey: 'sprintId' });
+Issue.belongsTo(Sprint, { foreignKey: 'sprintId' });
+
 module.exports = Issue;

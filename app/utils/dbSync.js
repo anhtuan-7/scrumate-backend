@@ -14,7 +14,7 @@ const tables = [User, Group, GroupUser, Project, ProjectUser, Sprint, Issue];
 async function syncTables() {
   for (const table of tables) {
     try {
-      await table.sync({ force: true }); // drop
+      await table.sync({ alter: true }); // drop
       console.log(`${table.tableName} table synced`);
     } catch (err) {
       throw err;

@@ -25,7 +25,7 @@ const Sprint = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 2, // 2 Weeks
     },
-    isActive: {
+    active: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,

@@ -126,3 +126,42 @@ exports.deleteIssue = catchAsync(async (req, res, next) => {
 
   return res.status(NO_CONTENT).json();
 });
+
+exports.getKanban = catchAsync(async (req, res, next) => {
+  const { projectId } = req.params;
+  const { user } = res.locals;
+
+  const issues = await Issue.findAll({
+    where: {
+      projectId,
+      assigneeId: user.id,
+    },
+    include: [
+      {
+        model: Sprint,
+        where: {
+          active: true,
+        },
+        attributes: ['id', 'name'],
+      },
+      {
+        model: User,
+        as: 'assignee',
+        attributes: ['id', 'name', 'email', 'avatar'],
+      },
+      {
+        model: User,
+        as: 'reporter',
+        attributes: ['id', 'name', 'email', 'avatar'],
+      },
+    ],
+  });
+
+  return res.status(OK).json({
+    status: 'success',
+    results: issues.length,
+    data: {
+      issues,
+    },
+  });
+});

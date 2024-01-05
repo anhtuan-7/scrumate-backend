@@ -1,5 +1,6 @@
 const express = require('express');
 const projectController = require('../controllers/projectController');
+const issueController = require('../controllers/issueController');
 const validate = require('../validations');
 const { projectCreateSchema } = require('../validations/projectSchema');
 const {
@@ -33,5 +34,7 @@ router
   .route('/:projectId')
   .get(checkUserRoleInProject(), projectController.getProject)
   .patch(projectController.updateProject);
+
+router.get('/:projectId/kanban', issueController.getKanban);
 
 module.exports = router;
