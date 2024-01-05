@@ -15,7 +15,7 @@ router
   .route('/')
   .get(issueController.getBacklog)
   .post(
-    checkUserRoleInProject('product-owner', 'scrum-master'),
+    checkUserRoleInProject(),
     validate(issueCreateSchema),
     issueController.createIssue,
   );

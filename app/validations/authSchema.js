@@ -5,6 +5,7 @@ const signUpSchema = Joi.object({
   name: Joi.string().min(3).max(100).required(),
   password: Joi.string().min(8).required(),
   confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+  avatar: Joi.string(),
 });
 
 const loginSchema = Joi.object({
