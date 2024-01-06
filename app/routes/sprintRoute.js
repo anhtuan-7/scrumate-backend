@@ -1,7 +1,11 @@
 const express = require('express');
 const sprintController = require('../controllers/sprintController');
 const validate = require('../validations');
-const { sprintCreateSchema } = require('../validations/sprintSchema');
+const {
+  sprintCreateSchema,
+  startSprintSchema,
+  sprintUpdateSchema,
+} = require('../validations/sprintSchema');
 const { checkUserRoleInProject, verifyToken } = require('../middlewares');
 
 const issueRoute = require('./issueRoute');
@@ -20,5 +24,16 @@ router
     validate(sprintCreateSchema),
     sprintController.createSprint,
   );
+
+router
+  .route('/:sprintId')
+  .patch(validate(sprintUpdateSchema), sprintController.updateSprint);
+
+router.patch('/:sprintId/complete', sprintController.completeSprint);
+router.patch(
+  '/:sprintId/start',
+  validate(startSprintSchema),
+  sprintController.startSprint,
+);
 
 module.exports = router;
