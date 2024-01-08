@@ -16,7 +16,7 @@ exports.getGroupUserList = catchAsync(async (req, res, next) => {
       attributes: ['role', 'lastAccessed', 'joinedAt'],
       where: { groupId },
     },
-    attributes: ['id', 'email', 'name'],
+    attributes: ['id', 'email', 'name', 'avatar'],
     order: [
       [
         { model: GroupUser, as: 'group' },
