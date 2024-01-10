@@ -1,4 +1,7 @@
 /* eslint-disable */
+const dotenv = require('dotenv');
+dotenv.config({ path: './.env.local', override: false });
+
 const {
   User,
   Group,

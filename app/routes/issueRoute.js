@@ -17,6 +17,7 @@ router
   .post(
     checkUserRoleInProject(),
     validate(issueCreateSchema),
+    checkUserRoleInProject('developer', 'product-owner'),
     issueController.createIssue,
   );
 
@@ -24,8 +25,12 @@ router
 
 router
   .route('/:issueId')
-  .get(issueController.getIssue)
-  .patch(validate(issueUpdateSchema), issueController.updateIssue)
-  .delete(issueController.deleteIssue);
+  .get(checkUserRoleInProject(), issueController.getIssue)
+  .patch(
+    checkUserRoleInProject('developer', 'product-owner'),
+    validate(issueUpdateSchema),
+    issueController.updateIssue,
+  )
+  .delete(checkUserRoleInProject('product-owner'), issueController.deleteIssue);
 
 module.exports = router;

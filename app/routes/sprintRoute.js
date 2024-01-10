@@ -27,12 +27,17 @@ router
 
 router
   .route('/:sprintId')
-  .patch(validate(sprintUpdateSchema), sprintController.updateSprint);
+  .patch(
+    validate(sprintUpdateSchema),
+    checkUserRoleInProject('scrum-master'),
+    sprintController.updateSprint,
+  );
 
 router.patch('/:sprintId/complete', sprintController.completeSprint);
 router.patch(
   '/:sprintId/start',
   validate(startSprintSchema),
+  checkUserRoleInProject('scrum-master'),
   sprintController.startSprint,
 );
 
